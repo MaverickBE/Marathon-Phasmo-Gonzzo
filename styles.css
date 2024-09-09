@@ -38,6 +38,29 @@
     color: #000000;
 }
 
+/* Style de base du bouton "Générer une nouvelle carte" */
+#boutonbingonzzo {
+    padding: 18px 18px;
+    align-items: center;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px;
+    background-color: #000000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Style au passage de la souris sur le bouton "Générer une nouvelle carte" */
+#boutonbingonzzo:hover {
+    background-color: white;
+    color: #000000;
+}
+
 /* Le media querie pour ce bouton (écran 600px) */
 @media only screen and (max-width: 600px) {
     #boutonGenerer {
