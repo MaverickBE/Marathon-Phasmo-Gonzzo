@@ -1,86 +1,80 @@
-/* L'image de Titre */
-#Logo_Bingonzzo {
-    
-    margin-top: 200px;
-    width: 700px; 
-    height: auto; 
-    border-radius: 5px;
-}
-
-/* Le media querie pour ce logo */
-@media only screen and (max-width: 600px) {
-    /* Styles spécifiques pour les écrans de moins de 600px de large */
-    #Logo_Bingonzzo {
-        max-width: 100%;
-    }
-}
-
-/* Style de base du bouton "Générer une nouvelle carte" */
-#boutonGenerer {
-    padding: 18px 18px;
-    align-items: center;
-    text-align: center;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 18px;
-    background-color: #000000;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-/* Style au passage de la souris sur le bouton "Générer une nouvelle carte" */
-#boutonGenerer:hover {
-    background-color: white;
-    color: #000000;
-}
-
-/* Style de base du bouton "Générer une nouvelle carte" */
-#boutonbingonzzo {
-    padding: 18px 18px;
-    align-items: center;
-    text-align: center;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 18px;
-    background-color: #000000;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-/* Style au passage de la souris sur le bouton "Générer une nouvelle carte" */
-#boutonbingonzzo:hover {
-    background-color: white;
-    color: #000000;
-}
-
-/* Le media querie pour ce bouton (écran 600px) */
-@media only screen and (max-width: 600px) {
-    #boutonGenerer {
-        max-width: 100%;
-    }
-}
-
-/* Le media querie pour ce bouton (écran 500px) */
-@media only screen and (max-width: 500px) {
-    #boutonGenerer {
-        font-size: 12px;
-        padding: 12px 12px;
-    }
-}
-
-/* Style de base du bouton "Partager ma carte" */
-#boutonPartager {
+/* LOGO "Marathon" */
+#Logo_Marathon {
     display: block;
-    padding: 18px 18px;
-    align-items: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;  /* assure le centrage même si le flex change */
+    width: 800px;        /* taille de base sur écran large */
+    height: auto;
+    max-width: 100%;
+    transition: transform 0.3s ease;
+}
+
+/* Zoom au survol */
+#Logo_Marathon:hover {
+    transform: scale(1.10); /* zoom léger */
+    }
+
+/* Écrans intermédiaires (tablettes, petits laptops) */
+@media only screen and (max-width: 1024px) {
+    #Logo_Marathon {
+        width: 230px;
+        margin-top: 12px;
+    }
+}
+
+/* Écrans type tablette verticale / petits écrans */
+@media only screen and (max-width: 768px) {
+    #Logo_Marathon {
+        width: 200px;
+        margin-top: 10px;
+    }
+}
+
+/* Smartphones */
+@media only screen and (max-width: 480px) {
+    #Logo_Marathon {
+        width: 70vw;      /* 70% de la largeur de l'écran */
+        max-width: 280px; /* mais ne dépasse pas 280px */
+        margin-top: 8px;
+    }
+}
+
+/* Version PETITE du logo après génération de la carte */
+#Logo_Marathon.logo-small {
+    width: 260px;
+    margin-top: 15px;
+}
+
+/* Écrans intermédiaires (tablettes, petits laptops) */
+@media only screen and (max-width: 1024px) {
+    #Logo_Marathon.logo-small {
+        width: 230px;
+        margin-top: 12px;
+    }
+}
+
+/* Tablette verticale / petits écrans */
+@media only screen and (max-width: 768px) {
+    #Logo_Marathon.logo-small {
+        width: 200px;
+        margin-top: 10px;
+    }
+}
+
+/* Smartphones */
+@media only screen and (max-width: 480px) {
+    #Logo_Marathon.logo-small {
+        width: 70vw;
+        max-width: 280px;
+        margin-top: 8px;
+    }
+}
+
+/* Style commun (desktop) */
+.bouton-action {
+    padding: 18px 24px;
     text-align: center;
     font-family: 'Courier New', Courier, monospace;
     font-size: 18px;
@@ -89,29 +83,39 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-bottom: 10px;
+    margin: 8px 0;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+    display: block;
+    width: fit-content;
+    max-width: 420px; /* limite la largeur même si écran petit */
 }
 
-/* Style au passage de la souris sur le bouton "Partager ma carte" */
-#boutonPartager:hover {
+/* Hover */
+.bouton-action:hover {
     background-color: white;
     color: #000000;
+    transform: scale(1.03);
 }
 
-/* Le media querie pour ce bouton (écran 600px) */
-@media only screen and (max-width: 600px) {
-    #boutonPartager {
-        max-width: 100%;
+/* 📱 Tablettes */
+@media (max-width: 768px) {
+    .bouton-action {
+        font-size: 16px;
+        padding: 12px 18px;
+        max-width: 280px; /* bouton plus court */
     }
 }
 
-/* Le media querie pour ce bouton (écran 500px) */
-@media only screen and (max-width: 500px) {
-    #boutonPartager {
-        font-size: 12px;
-        padding: 12px 12px;
+/* 📱 Smartphones */
+@media (max-width: 480px) {
+    .bouton-action {
+        font-size: 14px;
+        padding: 10px 14px;
+        max-width: 220px; /* encore plus compact */
     }
 }
+
+
 
 /* Style de la vidéo en background */
 video {
@@ -134,16 +138,39 @@ video {
     }
 }
 
-/* Style de base du corps de la page */
 body {
     background: black;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: center; 
     height: 100vh;
     margin: 0;
 }
+
+/* Mode "ACCUEIL" = page centrée verticalement */
+body.accueil {
+    background: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* centre verticalement */
+    height: 100vh;           /* bloque à la taille écran */
+    margin: 0;
+}
+
+/* Mode "CARTE" = page normale, scroll, logo non croppé */
+body.carte {
+    background: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;  /* pas centré */
+    min-height: 100vh;            /* permet de s’allonger */
+    margin: 0;
+    padding-top: 10px;
+}
+
 
 /* Style de base du fond du tableau */
 table {

@@ -14,18 +14,20 @@
 <body>
     
     <a href="https://maverickbe.github.io/Marathon-Phasmo-Gonzzo/">
-        <img src="images/Titre_Bingonzzo.webp" alt="Logo_Bingonzzo"style="margin-top: 60px ;width: 700px; height: auto; border-radius: 5px;">
+        <img id="Logo_Marathon" src="images/Titre_Marathon.webp" alt="Logo_Marathon">
     </a>
     <video autoplay muted loop playsinline poster="images/Fond_site_secours.png"> 
         <source src="videos/Fond_site.mp4" type="video/mp4"></video>
 
     <audio id="bingoSound" src="bruits/Gifle_validation.mp3"></audio>
 
-    <button id="boutonGenerer" onclick="genererNouvelleCarte()">Générer une nouvelle carte</button>
-    <button id="boutonbingonzzo" onclick="window.location.href='https://maverickbe.github.io/Bin-Gonzzo/';">Aller au Bin'Gonzzo</button>
-    <button id="boutonPartager" onclick="copierLien()" style="display:none;">Partager ma grille</button>
+    <button id="boutonGenerer" class="bouton-action" onclick="genererNouvelleCarte()">
+        Générer une nouvelle carte
+    </button>
 
-    <div id="bingo-message">BINGO</div>
+    <button id="boutonHub" class="bouton-action" onclick="window.location.href='https://maverickbe.github.io/Hub-Gonzzo/';">
+        Retourner au Hub Gonzzzo
+    </button>
 
     <table id="carte"></table>
 

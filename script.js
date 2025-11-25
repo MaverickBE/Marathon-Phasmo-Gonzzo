@@ -1,3 +1,29 @@
+// ============================
+//   MARATHON PHASMO GONZZO
+//   Grille 5 x 5 (25 cases)
+//   - PAS de seed
+//   - PAS de partage
+//   - PAS de bingo
+//   - 24 images random + 1 image fixe au centre
+// ============================
+
+console.log("script Marathon Phasmo chargé");
+
+document.body.classList.add("accueil");
+
+
+// --- CONFIG ---
+
+const GRID_ROWS = 5;
+const GRID_COLS = 5;
+// 5 x 5 = 25 cases, dont 1 centre => 24 images random
+
+// Case centrale (3e ligne, 3e colonne => index 2,2 en 0-based)
+const CENTER_ROW = 2;
+const CENTER_COL = 2;
+
+// 24 images pour toutes les cases SAUF le centre
+// ➜ on ENLÈVE Marathon.webp de cette liste, il sera utilisé seulement pour la case centrale
 const ListeImages = [
   { id: 1, name: "Banshee.webp" },
   { id: 2, name: "Démon.webp" },
@@ -23,59 +49,65 @@ const ListeImages = [
   { id: 22, name: "Obake.webp" },
   { id: 23, name: "Onryo.webp" },
   { id: 24, name: "Raiju.webp" },
-  { id: 25, name: "Marathon.webp" },
-  // Ajoutez le reste des images ici
+  // NOTE : Marathon.webp est retirée d'ici
 ];
 
-function genererNouvelleCarte(images) {
-  if (images === undefined) {
-    // Mélanger les images
-    images = shuffle(ListeImages);
-    var seed = "";
-    for (const image of images) {
-      if (image.id <= 9) {
-        seed += "0";
-      }
-      seed += image.id;
-    }
+// Image FIXE au centre
+const centerImage = {
+  name: "Marathon.webp", // l'image qui sera toujours en 3,3
+};
 
-    seed = seed.substring(0, 50);
-    var url = "?seed=" + seed;
-    window.history.pushState({ path: url }, "", url);
-    console.log(url);
+// ============================
+//       GÉNÉRATION CARTE
+// ============================
 
-    // Afficher le bouton de partage
-    document.getElementById("boutonPartager").style.display = "block";
+function genererNouvelleCarte() {
+  console.log("Génération de la carte Marathon 5x5...");
+
+  // Passe en mode "carte"
+document.body.classList.remove("accueil");
+document.body.classList.add("carte");
+
+// Réduit le logo
+document.getElementById("Logo_Marathon").classList.add("logo-small");
+
+  const table = document.getElementById("carte");
+  const imagesFolder = "images/";
+
+  if (!table) {
+    console.error("Table #carte introuvable dans le HTML");
+    return;
   }
 
-  // Récupérer la référence de la table
-  var table = document.getElementById("carte");
-  console.log("Carte générée");
-
-  // Effacer le contenu de la table //
   table.innerHTML = "";
 
-  // Récupérer la liste des images dans le dossier "images"
-  var imagesFolder = "images/";
+  const imagesMelangees = shuffle([...ListeImages]);
+  let indexImage = 0;
 
-  // Remplir la table avec les images
-  var count = 0;
-  for (var i = 0; i < 5; i++) {
-    var row = table.insertRow(i);
-    for (var j = 0; j < 5; j++) {
-      var cell = row.insertCell(j);
-      var img = document.createElement("img");
-      img.src = imagesFolder + images[count].name;
-      img.alt = "Image " + (count + 1);
+  for (let i = 0; i < GRID_ROWS; i++) {
+    const row = table.insertRow(i);
 
-      // Créer un overlay pour la superposition du logo de validation
-      var overlay = document.createElement("div");
+    for (let j = 0; j < GRID_COLS; j++) {
+      const cell = row.insertCell(j);
+      const img = document.createElement("img");
+
+      if (i === CENTER_ROW && j === CENTER_COL) {
+        img.src = imagesFolder + centerImage.name;
+        img.alt = "Image centre Marathon";
+      } else {
+        const imageData = imagesMelangees[indexImage];
+        if (!imageData) continue;
+        img.src = imagesFolder + imageData.name;
+        img.alt = "Image " + imageData.id;
+        indexImage++;
+      }
+
+      const overlay = document.createElement("div");
       overlay.className = "overlay";
 
-      // Ajouter un logo de validation (visible lorsque sélectionné)
-      var logo = document.createElement("img");
+      const logo = document.createElement("img");
       logo.src = "images/Valide.webp";
-      logo.alt = "Bingo_confirme";
+      logo.alt = "Valide";
       logo.className = "logo";
 
       overlay.appendChild(logo);
@@ -84,87 +116,51 @@ function genererNouvelleCarte(images) {
 
       cell.addEventListener("click", function () {
         toggleSelected(this);
-        verifierBingo();
       });
-
-      count++;
     }
+  }
+
+  // 🔽 ICI : on passe le logo en version "petite"
+  const logoMarathon = document.getElementById("Logo_Marathon");
+  if (logoMarathon) {
+    logoMarathon.classList.add("logo-small");
   }
 }
 
-function ControlSeedURL() {
-  var paramsString = window.location.search;
-  var searchParams = new URLSearchParams(paramsString);
-  if (searchParams.has("seed") === true) {
-    if (searchParams.get("seed").length == 50) {
-      CutSeed(searchParams.get("seed"));
-    } else {
-      alert("Mauvais format de seed");
-    }
-  }
-}
 
-ControlSeedURL();
+// ============================
+//       SÉLECTION / SON
+// ============================
 
-function doublon(tableau) {
-  var tableauunique = Array.from(new Set(tableau));
-  return tableau.length !== tableauunique.length;
-}
-
-// Découpe le seed
-function CutSeed(seed) {
-  var ListeImagesGenerees = [];
-  var tableidimages = seed.match(/.{1,2}/g);
-  for (id of tableidimages) {
-    for (image of ListeImages) {
-      if (image.id == id) {
-        ListeImagesGenerees.push(image);
-      }
-    }
-  }
-  // Vérifie s'il y a des doublons dans la liste d'ID
-  if (doublon(ListeImagesGenerees)) {
-    alert("Mauvais format de seed");
+function toggleSelected(cell) {
+  if (cell.classList.contains("selected")) {
+    cell.classList.remove("selected");
+    console.log("Case unselected");
   } else {
-    // Vérifie qu'il y a bien 25 ID's d'images
-    if (ListeImagesGenerees.length == 25) {
-      genererNouvelleCarte(ListeImagesGenerees);
-    } else {
-      alert("Mauvais format de seed");
-    }
+    cell.classList.add("selected");
+    console.log("Case selected");
   }
+
+  jouerSonBingo();
 }
 
-function copierLien() {
-  var lienGeneré = window.location.href;
-
-  // Créer un élément textarea temporaire
-  var textarea = document.createElement("textarea");
-  textarea.value = lienGeneré;
-
-  // Ajouter l'élément textarea à la page
-  document.body.appendChild(textarea);
-
-  // Sélectionner le texte dans l'élément textarea
-  textarea.select();
-  textarea.setSelectionRange(0, 99999); // Pour les navigateurs mobiles
-
-  // Copier le texte dans le presse-papiers
-  document.execCommand("copy");
-
-  // Retirer l'élément textarea temporaire de la page
-  document.body.removeChild(textarea);
-
-  // Afficher une notification  après la copie
-  alert("Lien copié dans le presse-papiers");
+function jouerSonBingo() {
+  const audio = document.getElementById("bingoSound");
+  if (!audio) return;
+  audio.volume = 0.2;
+  audio.play();
 }
 
-// Fonction pour mélanger un tableau
+// ============================
+//   FONCTION DE MÉLANGE
+// ============================
+
 function shuffle(array) {
-  var currentIndex = array.length,
-    randomIndex;
+  let currentIndex = array.length;
+  let randomIndex;
 
-  while (currentIndex != 0) {
+  // Algorithme de Fisher–Yates
+  while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
 
@@ -177,24 +173,15 @@ function shuffle(array) {
   return array;
 }
 
-// Fonction pour basculer l'état sélectionné d'une cellule
-function toggleSelected(cell) {
-  // Vérifier si la cellule est déjà sélectionnée
-  if (cell.classList.contains("selected")) {
-    // Supprimer la classe "selected"
-    cell.classList.remove("selected");
-    console.log("Case unselected");
-  } else {
-    // Ajouter la classe "selected"
-    cell.classList.add("selected");
-    console.log("Case selected");
+// ============================
+//   INITIALISATION
+// ============================
+
+document.addEventListener("DOMContentLoaded", () => {
+  // On peut soit générer direct, soit attendre le clic.
+  // Là on attend le clic, comme pour les autres pages :
+  const boutonGenerer = document.getElementById("boutonGenerer");
+  if (boutonGenerer) {
+    boutonGenerer.style.display = "block";
   }
-
-  jouerSonBingo();
-}
-
-function jouerSonBingo() {
-  var audio = document.getElementById("bingoSound");
-  audio.volume = 0.2;
-  audio.play();
-}
+});
