@@ -118,7 +118,7 @@ function genererNouvelleCarte() {
       
 
 
-  // 🔽 ICI : on passe le logo en version "petite"
+  // 🔽 ICI : on passe le logo en version "petit"
   const logoMarathon = document.getElementById("Logo_Marathon");
   if (logoMarathon) {
     logoMarathon.classList.add("logo-small");
