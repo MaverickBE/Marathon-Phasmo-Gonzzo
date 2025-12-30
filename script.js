@@ -1,19 +1,13 @@
 // ============================
-//   MARATHON PHASMO GONZZO
-//   Grille responsive (28 cases)
-//   - 27 images random + 1 image fixe au centre
-//   - Desktop: 7x4
-//   - Mobile: 4x7
+//   MARATHON PHASMO GONZZO (OPTI + STATE)
 // ============================
 
-console.log("script Marathon Phasmo chargé");
+console.log("script Marathon Phasmo (opti+state) chargé");
 
-// Force l'accueil au chargement
 document.body.classList.add("accueil");
 document.body.classList.remove("carte");
 
-// --- CONFIG ---
-const TOTAL_SELECTABLE = 27; // 27 cases cochables (toutes sauf centre)
+const TOTAL_SELECTABLE = 27;
 
 const ListeImages = [
   { id: 1, name: "Banshee.webp" },
@@ -47,7 +41,18 @@ const ListeImages = [
 
 const centerImage = { name: "Marathon.webp" };
 
-// PERF resize mobile (Safari)
+// ----------------------------
+// STATE (pour conserver la grille au resize)
+// ----------------------------
+let state = {
+  hasGrid: false,
+  imagesOrder: [],              // 27 noms d'images dans l'ordre tiré
+  selected: new Set(),          // indices linéaires (0..27) sélectionnés, hors centre
+};
+
+let selectedCount = 0;
+
+// PERF resize
 let lastLayoutMode = null;
 let resizeTimer = null;
 
@@ -57,106 +62,43 @@ function getLayoutMode() {
 
 function getLayout() {
   const w = window.innerWidth;
-
-  if (w <= 700) {
-    return { rows: 7, cols: 4, centerRow: 3, centerCol: 1 };
-  }
-
+  if (w <= 700) return { rows: 7, cols: 4, centerRow: 3, centerCol: 1 };
   return { rows: 4, cols: 7, centerRow: 1, centerCol: 3 };
 }
 
-// ============================
-//       GÉNÉRATION CARTE
-// ============================
-
-function genererNouvelleCarte() {
-  console.log("Génération de la carte Marathon responsive...");
-
-  document.body.classList.remove("fin-marathon");
-  document.body.classList.remove("accueil");
-  document.body.classList.add("carte");
-
-  const logoMarathon = document.getElementById("Logo_Marathon");
-  if (logoMarathon) logoMarathon.classList.add("logo-small");
-
-  const table = document.getElementById("carte");
-  const imagesFolder = "images/";
-  if (!table) return;
-
-  const { rows: GRID_ROWS, cols: GRID_COLS, centerRow: CENTER_ROW, centerCol: CENTER_COL } = getLayout();
-  lastLayoutMode = getLayoutMode();
-
-  table.innerHTML = "";
-
-  const imagesMelangees = shuffle([...ListeImages]);
-  let indexImage = 0;
-
-  for (let i = 0; i < GRID_ROWS; i++) {
-    const row = table.insertRow(i);
-
-    for (let j = 0; j < GRID_COLS; j++) {
-      const cell = row.insertCell(j);
-
-      // Image principale de la case
-      const img = document.createElement("img");
-      img.className = "cell-img"; // ✅ IMPORTANT
-
-      // Cache le ? bleu si image manquante
-      img.onerror = function () {
-        this.style.display = "none";
-      };
-
-      if (i === CENTER_ROW && j === CENTER_COL) {
-        img.src = imagesFolder + centerImage.name;
-        img.alt = "Image centre Marathon";
-        cell.classList.add("cell-center");
-        cell.style.cursor = "default";
-      } else {
-        const imageData = imagesMelangees[indexImage];
-        if (imageData) {
-          img.src = imagesFolder + imageData.name;
-          img.alt = "Image " + imageData.id;
-        } else {
-          cell.classList.add("cell-empty");
-        }
-        indexImage++;
-      }
-
-      // Overlay + logo validation
-      const overlay = document.createElement("div");
-      overlay.className = "overlay";
-
-      const logo = document.createElement("img");
-      logo.src = "images/Valide.webp";
-      logo.alt = "Valide";
-      logo.className = "logo";
-
-      overlay.appendChild(logo);
-      cell.appendChild(img);
-      cell.appendChild(overlay);
-
-      if (!(i === CENTER_ROW && j === CENTER_COL)) {
-        cell.addEventListener("click", function () {
-          toggleSelected(this);
-        });
-      }
-    }
-  }
+function centerIndexForLayout(layout) {
+  return layout.centerRow * layout.cols + layout.centerCol;
 }
 
-// ============================
-//       SÉLECTION / SON
-// ============================
+function shuffle(array) {
+  let currentIndex = array.length;
+  while (currentIndex !== 0) {
+    const randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
 
-function toggleSelected(cell) {
-  if (cell.classList.contains("cell-center")) return;
-  if (document.body.classList.contains("fin-marathon")) return;
+// Audio: armement
+let audioArmed = false;
+function armAudio() {
+  if (audioArmed) return;
+  const audio = document.getElementById("bingoSound");
+  if (!audio) return;
 
-  cell.classList.toggle("selected");
-  cell.classList.toggle("show-logo");
-
-  jouerSonBingo();
-  verifierFinMarathon();
+  audio.volume = 0;
+  audio.currentTime = 0;
+  audio.play()
+    .then(() => {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.volume = 0.2;
+      audioArmed = true;
+    })
+    .catch(() => {
+      audio.volume = 0.2;
+    });
 }
 
 function jouerSonBingo() {
@@ -167,16 +109,27 @@ function jouerSonBingo() {
   audio.play().catch(() => {});
 }
 
-// ============================
-//       FIN MARATHON
-// ============================
+function resetToAccueil() {
+  const grid = document.getElementById("carte");
+  if (grid) grid.innerHTML = "";
 
-function verifierFinMarathon() {
-  const table = document.getElementById("carte");
-  if (!table) return;
+  document.body.classList.remove("carte");
+  document.body.classList.add("accueil");
+  document.body.classList.remove("fin-marathon");
 
-  const selectedCount = table.querySelectorAll("td.selected").length;
-  if (selectedCount === TOTAL_SELECTABLE) afficherMessageBravoEtRetour();
+  const logo = document.getElementById("Logo_Marathon");
+  if (logo) logo.classList.remove("logo-small");
+
+  const msg = document.getElementById("marathon-message");
+  if (msg) msg.style.display = "none";
+
+  // reset state
+  state.hasGrid = false;
+  state.imagesOrder = [];
+  state.selected = new Set();
+  selectedCount = 0;
+
+  window.scrollTo(0, 0);
 }
 
 function afficherMessageBravoEtRetour() {
@@ -193,58 +146,205 @@ function afficherMessageBravoEtRetour() {
   msg.textContent = "Marathon terminé 🎉";
   msg.style.display = "block";
 
-  setTimeout(() => {
-    const table = document.getElementById("carte");
-    if (table) table.innerHTML = "";
-
-    document.body.classList.remove("carte");
-    document.body.classList.add("accueil");
-    document.body.classList.remove("fin-marathon");
-
-    const logo = document.getElementById("Logo_Marathon");
-    if (logo) logo.classList.remove("logo-small");
-
-    msg.style.display = "none";
-    window.scrollTo(0, 0);
-  }, 10000);
+  setTimeout(resetToAccueil, 10000);
 }
 
-// ============================
-//   SHUFFLE
-// ============================
+// ----------------------------
+// Build grid from state/imagesOrder
+// ----------------------------
+function buildGridFromState() {
+  const grid = document.getElementById("carte");
+  if (!grid) return;
 
-function shuffle(array) {
-  let currentIndex = array.length;
-  let randomIndex;
+  const layout = getLayout();
+  lastLayoutMode = getLayoutMode();
 
-  while (currentIndex !== 0) {
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  grid.style.setProperty("--cols", layout.cols);
+  grid.innerHTML = "";
+
+  const frag = document.createDocumentFragment();
+  const imagesFolder = "images/";
+
+  const centerIndex = centerIndexForLayout(layout);
+
+  // On place 28 cellules: 27 images + centre fixe
+  // Mapping: on remplit toutes les positions sauf centre avec state.imagesOrder (27 items)
+  let k = 0;
+
+  for (let idx = 0; idx < layout.rows * layout.cols; idx++) {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.dataset.idx = String(idx);
+
+    const img = document.createElement("img");
+    img.className = "cell-img";
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.onerror = function () { this.style.display = "none"; };
+
+    if (idx === centerIndex) {
+      img.src = imagesFolder + centerImage.name;
+      img.alt = "Centre Marathon";
+      cell.classList.add("cell-center");
+      cell.dataset.center = "1";
+    } else {
+      const name = state.imagesOrder[k++];
+      if (name) {
+        img.src = imagesFolder + name;
+        img.alt = name;
+      }
+    }
+
+    const overlay = document.createElement("div");
+    overlay.className = "overlay";
+
+    const logo = document.createElement("img");
+    logo.className = "logo";
+    logo.src = "images/Valide.webp";
+    logo.alt = "Valide";
+    logo.loading = "lazy";
+    logo.decoding = "async";
+
+    overlay.appendChild(logo);
+    cell.appendChild(img);
+    cell.appendChild(overlay);
+
+    // Ré-applique la sélection
+    if (state.selected.has(idx)) {
+      cell.classList.add("selected", "show-logo");
+    }
+
+    frag.appendChild(cell);
   }
-  return array;
+
+  grid.appendChild(frag);
 }
 
-// ============================
-//   INIT + RESIZE PERF
-// ============================
+// Génère une nouvelle carte (nouvel ordre) + build
+function genererNouvelleCarte() {
+  document.body.classList.remove("fin-marathon");
+  document.body.classList.remove("accueil");
+  document.body.classList.add("carte");
+
+  const logoMarathon = document.getElementById("Logo_Marathon");
+  if (logoMarathon) logoMarathon.classList.add("logo-small");
+
+  // Nouveau tirage
+  const order = shuffle([...ListeImages]).map(x => x.name); // 27 noms
+  state.hasGrid = true;
+  state.imagesOrder = order;
+  state.selected = new Set();
+  selectedCount = 0;
+
+  buildGridFromState();
+}
+
+// 1 listener grid
+function onGridClick(e) {
+  const grid = document.getElementById("carte");
+  if (!grid) return;
+
+  const cell = e.target.closest(".cell");
+  if (!cell || !grid.contains(cell)) return;
+
+  if (cell.dataset.center === "1") return;
+  if (document.body.classList.contains("fin-marathon")) return;
+
+  const idx = Number(cell.dataset.idx);
+  if (Number.isNaN(idx)) return;
+
+  const wasSelected = cell.classList.contains("selected");
+  if (wasSelected) {
+    cell.classList.remove("selected", "show-logo");
+    state.selected.delete(idx);
+    selectedCount--;
+  } else {
+    cell.classList.add("selected", "show-logo");
+    state.selected.add(idx);
+    selectedCount++;
+  }
+
+  jouerSonBingo();
+
+  if (selectedCount === TOTAL_SELECTABLE) {
+    afficherMessageBravoEtRetour();
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-  const boutonGenerer = document.getElementById("boutonGenerer");
-  if (boutonGenerer) boutonGenerer.style.display = "block";
   lastLayoutMode = getLayoutMode();
+
+  document.addEventListener("pointerdown", armAudio, { once: true, passive: true });
+
+  const boutonGenerer = document.getElementById("boutonGenerer");
+  if (boutonGenerer) {
+    boutonGenerer.addEventListener("click", () => {
+      armAudio();
+      genererNouvelleCarte();
+    });
+  }
+
+  const grid = document.getElementById("carte");
+  if (grid) {
+    grid.addEventListener("click", onGridClick);
+  }
 });
 
+// Resize: si changement mobile/desktop, on rebuild avec la même grille + mêmes coches
 window.addEventListener("resize", () => {
   if (!document.body.classList.contains("carte")) return;
   if (document.body.classList.contains("fin-marathon")) return;
+  if (!state.hasGrid) return;
 
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     const mode = getLayoutMode();
     if (mode !== lastLayoutMode) {
       lastLayoutMode = mode;
-      genererNouvelleCarte();
+
+      // 🔁 On conserve imagesOrder + selected (par index)
+      // MAIS: centreIndex change, donc les indices sélectionnés doivent être remappés proprement.
+      // On fait un remap "position -> position" via tableau de 28 cases, puis on rebuild.
+      remapSelectionBetweenLayouts();
+      buildGridFromState();
     }
   }, 200);
 });
+
+// Remap pour garder les mêmes cases cochées malgré changement centre position
+function remapSelectionBetweenLayouts() {
+  const oldLayout = (lastLayoutMode === "mobile")
+    ? { rows: 4, cols: 7, centerRow: 1, centerCol: 3 }   // on vient de quitter desktop
+    : { rows: 7, cols: 4, centerRow: 3, centerCol: 1 };  // on vient de quitter mobile
+
+  const newLayout = getLayout();
+
+  const oldCenter = centerIndexForLayout(oldLayout);
+  const newCenter = centerIndexForLayout(newLayout);
+
+  // tableau des 28 positions (true/false) sauf centre
+  const oldFlags = Array(oldLayout.rows * oldLayout.cols).fill(false);
+  for (const idx of state.selected) {
+    if (idx !== oldCenter) oldFlags[idx] = true;
+  }
+
+  // On transfère par ordre de lecture, en ignorant le centre
+  // On crée une liste linéaire de 27 bools correspondant aux 27 cases non-centre
+  const list27 = [];
+  for (let i = 0; i < oldFlags.length; i++) {
+    if (i === oldCenter) continue;
+    list27.push(oldFlags[i]);
+  }
+
+  // On re-pose dans le nouveau layout (en ignorant le nouveau centre)
+  const newSelected = new Set();
+  let k = 0;
+  for (let i = 0; i < newLayout.rows * newLayout.cols; i++) {
+    if (i === newCenter) continue;
+    if (list27[k]) newSelected.add(i);
+    k++;
+  }
+
+  state.selected = newSelected;
+  selectedCount = state.selected.size;
+}

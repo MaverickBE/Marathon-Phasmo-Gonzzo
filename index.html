@@ -1,47 +1,58 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <script src="https://kit.fontawesome.com/7cfb1ef2dc.js" crossorigin="anonymous"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <title>Marathon Phasmo Gonzzo</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+  <title>Marathon Phasmo Gonzzo</title>
 </head>
 
 <body class="accueil">
 
-    <video autoplay muted loop playsinline poster="images/Fond_site_secours.png">
-        <source src="videos/Fond_site.mp4" type="video/mp4">
-    </video>
+  <a href="https://maverickbe.github.io/Marathon-Phasmo-Gonzzo/">
+    <img id="Logo_Marathon" src="images/Titre_Marathon.webp" alt="Logo_Marathon" loading="eager" decoding="async">
+  </a>
 
-    <div class="top-ui">
-        <a href="https://maverickbe.github.io/Marathon-Phasmo-Gonzzo/">
-            <img id="Logo_Marathon" src="images/Titre_Marathon.webp" alt="Logo_Marathon">
-        </a>
+  <!-- Desktop: vidéo. Mobile: cachée via CSS, et fond image via CSS -->
+  <video id="bgVideo" autoplay muted loop playsinline poster="images/Fond_site_mobile.webp">
+    <source src="videos/Fond_site.mp4" type="video/mp4">
+  </video>
 
-        <audio id="bingoSound" src="bruits/Gifle_validation.mp3"></audio>
+  <audio id="bingoSound" src="bruits/Gifle_validation.mp3" preload="none"></audio>
 
-        <button id="boutonGenerer" class="bouton-action" onclick="genererNouvelleCarte()">
-            Générer une nouvelle carte
-        </button>
+  <button id="boutonGenerer" class="bouton-action" type="button">
+    Générer une carte
+  </button>
 
-        <button id="boutonHub" class="bouton-action" onclick="window.location.href='https://maverickbe.github.io/Hub-Gonzzo/';">
-            Retourner au Hub Gonzzzo
-        </button>
-    </div>
+  <button id="boutonHub" class="bouton-action" type="button"
+    onclick="window.location.href='https://maverickbe.github.io/Hub-Gonzzo/';">
+    Retourner au Hub
+  </button>
 
-    <div class="grid-wrap">
-        <table id="carte"></table>
-    </div>
+  <!-- ✅ Grille: div propre (CSS Grid) -->
+  <div id="carte" aria-label="Grille Marathon"></div>
 
-    <div id="reseaux-sociaux">
-        <a href="https://www.twitch.tv/gonzzotv" target="_blank" class="social-icon"><i class="fab fa-twitch"></i></a>
-        <a href="https://discord.com/invite/YwDNjNGFKz" target="_blank" class="social-icon"><i class="fab fa-discord"></i></a>
-        <a href="https://www.tiktok.com/@gonzzotv" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>
-        <a href="https://www.youtube.com/channel/UCtAAoopTx7OreKRmLUAQAgw" target="_blank" class="social-icon"><i class="fab fa-youtube"></i></a>
-    </div>
+  <!-- ✅ Réseaux sociaux en SVG (pas de FontAwesome) -->
+  <div id="reseaux-sociaux" aria-label="Réseaux sociaux">
+  <a href="https://www.twitch.tv/gonzzotv" target="_blank" rel="noopener" class="social-icon" aria-label="Twitch">
+    <img src="images/icon-twitch.png" alt="Twitch" loading="lazy" decoding="async">
+  </a>
 
-    <script src="script.js"></script>
+  <a href="https://discord.com/invite/YwDNjNGFKz" target="_blank" rel="noopener" class="social-icon" aria-label="Discord">
+    <img src="images/icon-discord.png" alt="Discord" loading="lazy" decoding="async">
+  </a>
+
+  <a href="https://www.tiktok.com/@gonzzotv" target="_blank" rel="noopener" class="social-icon" aria-label="TikTok">
+    <img src="images/icon-tiktok.png" alt="TikTok" loading="lazy" decoding="async">
+  </a>
+
+  <a href="https://www.youtube.com/channel/UCtAAoopTx7OreKRmLUAQAgw" target="_blank" rel="noopener" class="social-icon" aria-label="YouTube">
+    <img src="images/icon-youtube.png" alt="YouTube" loading="lazy" decoding="async">
+  </a>
+</div>
+
+
+  <script src="script.js"></script>
 </body>
 </html>
