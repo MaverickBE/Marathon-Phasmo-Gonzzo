@@ -7,29 +7,33 @@
     <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <title>Marathon Phasmo Gonzzo</title>
-    <style>
-       
-    </style>
 </head>
-<body>
-    
-    <a href="https://maverickbe.github.io/Marathon-Phasmo-Gonzzo/">
-        <img id="Logo_Marathon" src="images/Titre_Marathon.webp" alt="Logo_Marathon">
-    </a>
-    <video autoplay muted loop playsinline poster="images/Fond_site_secours.png"> 
-        <source src="videos/Fond_site.mp4" type="video/mp4"></video>
 
-    <audio id="bingoSound" src="bruits/Gifle_validation.mp3"></audio>
+<body class="accueil">
 
-    <button id="boutonGenerer" class="bouton-action" onclick="genererNouvelleCarte()">
-        Générer une nouvelle carte
-    </button>
+    <video autoplay muted loop playsinline poster="images/Fond_site_secours.png">
+        <source src="videos/Fond_site.mp4" type="video/mp4">
+    </video>
 
-    <button id="boutonHub" class="bouton-action" onclick="window.location.href='https://maverickbe.github.io/Hub-Gonzzo/';">
-        Retourner au Hub Gonzzzo
-    </button>
+    <div class="top-ui">
+        <a href="https://maverickbe.github.io/Marathon-Phasmo-Gonzzo/">
+            <img id="Logo_Marathon" src="images/Titre_Marathon.webp" alt="Logo_Marathon">
+        </a>
 
-    <table id="carte"></table>
+        <audio id="bingoSound" src="bruits/Gifle_validation.mp3"></audio>
+
+        <button id="boutonGenerer" class="bouton-action" onclick="genererNouvelleCarte()">
+            Générer une nouvelle carte
+        </button>
+
+        <button id="boutonHub" class="bouton-action" onclick="window.location.href='https://maverickbe.github.io/Hub-Gonzzo/';">
+            Retourner au Hub Gonzzzo
+        </button>
+    </div>
+
+    <div class="grid-wrap">
+        <table id="carte"></table>
+    </div>
 
     <div id="reseaux-sociaux">
         <a href="https://www.twitch.tv/gonzzotv" target="_blank" class="social-icon"><i class="fab fa-twitch"></i></a>
@@ -37,9 +41,7 @@
         <a href="https://www.tiktok.com/@gonzzotv" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>
         <a href="https://www.youtube.com/channel/UCtAAoopTx7OreKRmLUAQAgw" target="_blank" class="social-icon"><i class="fab fa-youtube"></i></a>
     </div>
-        
-<script src="script.js"></script>
 
+    <script src="script.js"></script>
 </body>
-
 </html>

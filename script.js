@@ -1,29 +1,16 @@
-// ============================
-//   MARATHON PHASMO GONZZO
-//   Grille 5 x 5 (25 cases)
-//   - PAS de seed
-//   - PAS de partage
-//   - PAS de bingo
-//   - 24 images random + 1 image fixe au centre
-// ============================
-
-console.log("script Marathon Phasmo chargé");
-
-document.body.classList.add("accueil");
-
-
 // --- CONFIG ---
 
-const GRID_ROWS = 5;
-const GRID_COLS = 5;
-// 5 x 5 = 25 cases, dont 1 centre => 24 images random
+const GRID_ROWS = 4;
+const GRID_COLS = 7;
+// 4 x 7 = 28 cases
 
-// Case centrale (3e ligne, 3e colonne => index 2,2 en 0-based)
-const CENTER_ROW = 2;
-const CENTER_COL = 2;
+const TOTAL_SELECTABLE = 27; // 27 cases cochables (toutes sauf le centre)
 
-// 24 images pour toutes les cases SAUF le centre
-// ➜ on ENLÈVE Marathon.webp de cette liste, il sera utilisé seulement pour la case centrale
+// Case "centrale" choisie (tu peux bouger si tu veux)
+const CENTER_ROW = 1; // 2e ligne (0-based)
+const CENTER_COL = 3; // 4e colonne (0-based)
+
+// 27 entités (TOUTES sauf Marathon.webp)
 const ListeImages = [
   { id: 1, name: "Banshee.webp" },
   { id: 2, name: "Démon.webp" },
@@ -49,27 +36,24 @@ const ListeImages = [
   { id: 22, name: "Obake.webp" },
   { id: 23, name: "Onryo.webp" },
   { id: 24, name: "Raiju.webp" },
-  // NOTE : Marathon.webp est retirée d'ici
+
+  // NOUVELLES ENTITÉS
+  { id: 25, name: "Obambo.webp" },
+  { id: 26, name: "Gallu.webp" },
+  { id: 27, name: "Dayan.webp" },
 ];
 
 // Image FIXE au centre
-const centerImage = {
-  name: "Marathon.webp", // l'image qui sera toujours en 3,3
-};
-
-// ============================
-//       GÉNÉRATION CARTE
-// ============================
+const centerImage = { name: "Marathon.webp" };
 
 function genererNouvelleCarte() {
-  console.log("Génération de la carte Marathon 5x5...");
+  console.log("Génération de la carte Marathon 4x7...");
 
-  // Passe en mode "carte"
-document.body.classList.remove("accueil");
-document.body.classList.add("carte");
+  document.body.classList.remove("accueil");
+  document.body.classList.add("carte");
 
-// Réduit le logo
-document.getElementById("Logo_Marathon").classList.add("logo-small");
+  const logoEl = document.getElementById("Logo_Marathon");
+  if (logoEl) logoEl.classList.add("logo-small");
 
   const table = document.getElementById("carte");
   const imagesFolder = "images/";
@@ -96,7 +80,11 @@ document.getElementById("Logo_Marathon").classList.add("logo-small");
         img.alt = "Image centre Marathon";
       } else {
         const imageData = imagesMelangees[indexImage];
-        if (!imageData) continue;
+        if (!imageData) {
+          // Si un jour tu changes la taille et qu'il manque des images, on évite le crash
+          cell.classList.add("empty");
+          continue;
+        }
         img.src = imagesFolder + imageData.name;
         img.alt = "Image " + imageData.id;
         indexImage++;
@@ -114,18 +102,28 @@ document.getElementById("Logo_Marathon").classList.add("logo-small");
       cell.appendChild(img);
       cell.appendChild(overlay);
 
-      cell.addEventListener("click", function () {
-        toggleSelected(this);
-      });
-    }
-  }
+      // ✅ Centre = pas cliquable
+      if (i === CENTER_ROW && j === CENTER_COL) {
+        cell.classList.add("cell-center");
+        cell.style.cursor = "default";
+        // Pas d'event listener
+      } else {
+        cell.addEventListener("click", function () {
+          toggleSelected(this);
+        });
+      }
+     }
+     }
+     } 
+      
+
 
   // 🔽 ICI : on passe le logo en version "petite"
   const logoMarathon = document.getElementById("Logo_Marathon");
   if (logoMarathon) {
     logoMarathon.classList.add("logo-small");
   }
-}
+
 
 
 // ============================
@@ -133,16 +131,23 @@ document.getElementById("Logo_Marathon").classList.add("logo-small");
 // ============================
 
 function toggleSelected(cell) {
+  // Sécurité: si un jour un clic arrive sur la case centre, on ignore
+  if (cell.classList.contains("cell-center")) return;
+
   if (cell.classList.contains("selected")) {
     cell.classList.remove("selected");
+    cell.classList.remove("show-logo");
     console.log("Case unselected");
   } else {
     cell.classList.add("selected");
+    cell.classList.add("show-logo");
     console.log("Case selected");
   }
 
   jouerSonBingo();
+  verifierFinMarathon();
 }
+
 
 function jouerSonBingo() {
   const audio = document.getElementById("bingoSound");
@@ -171,6 +176,61 @@ function shuffle(array) {
   }
 
   return array;
+}
+
+function verifierFinMarathon() {
+  const table = document.getElementById("carte");
+  if (!table) return;
+
+  // ✅ on compte uniquement les cases selected (la case centre n'est jamais selected)
+  const selectedCount = table.querySelectorAll("td.selected").length;
+
+  if (selectedCount === TOTAL_SELECTABLE) {
+    afficherMessageBravoEtRetour();
+  }
+}
+
+// ============================
+//   VERIF FIN DE MARATHON
+// ============================
+
+function afficherMessageBravoEtRetour() {
+  // éviter de déclencher 2 fois
+  if (document.body.classList.contains("fin-marathon")) return;
+  document.body.classList.add("fin-marathon");
+
+  // Crée/affiche un message
+  let msg = document.getElementById("marathon-message");
+  if (!msg) {
+    msg = document.createElement("div");
+    msg.id = "marathon-message";
+    document.body.appendChild(msg);
+  }
+
+  msg.textContent = " Marathon terminé 🎉";
+  msg.style.display = "block";
+
+  // Après 10 secondes: reset + retour accueil
+  setTimeout(() => {
+    // Supprime la grille
+    const table = document.getElementById("carte");
+    if (table) table.innerHTML = "";
+
+    // Revenir en accueil
+    document.body.classList.remove("carte");
+    document.body.classList.add("accueil");
+    document.body.classList.remove("fin-marathon");
+
+    // Remettre logo grand
+    const logo = document.getElementById("Logo_Marathon");
+    if (logo) logo.classList.remove("logo-small");
+
+    // Cache le message
+    msg.style.display = "none";
+
+    // (Optionnel) remonter en haut
+    window.scrollTo(0, 0);
+  }, 10000);
 }
 
 // ============================
