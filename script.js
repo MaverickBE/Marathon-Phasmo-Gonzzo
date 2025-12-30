@@ -1,14 +1,22 @@
+// ============================
+//   MARATHON PHASMO GONZZO
+//   Grille responsive (28 cases)
+//   - PAS de seed
+//   - PAS de partage
+//   - PAS de bingo
+//   - 27 images random + 1 image fixe au centre
+//   - Desktop: 7x4
+//   - Mobile: 4x7
+// ============================
+
+console.log("script Marathon Phasmo chargé");
+
+// Force l'accueil au chargement
+document.body.classList.add("accueil");
+document.body.classList.remove("carte");
+
 // --- CONFIG ---
-
-const GRID_ROWS = 4;
-const GRID_COLS = 7;
-// 4 x 7 = 28 cases
-
-const TOTAL_SELECTABLE = 27; // 27 cases cochables (toutes sauf le centre)
-
-// Case "centrale" choisie (tu peux bouger si tu veux)
-const CENTER_ROW = 1; // 2e ligne (0-based)
-const CENTER_COL = 3; // 4e colonne (0-based)
+const TOTAL_SELECTABLE = 27; // 27 cases cochables (toutes sauf centre)
 
 // 27 entités (TOUTES sauf Marathon.webp)
 const ListeImages = [
@@ -46,14 +54,47 @@ const ListeImages = [
 // Image FIXE au centre
 const centerImage = { name: "Marathon.webp" };
 
-function genererNouvelleCarte() {
-  console.log("Génération de la carte Marathon 4x7...");
+// ----------------------------
+// PERF MOBILE: éviter regen sur chaque micro-resize Safari
+// ----------------------------
+let lastLayoutMode = null;
+let resizeTimer = null;
 
+function getLayoutMode() {
+  return window.innerWidth <= 700 ? "mobile" : "desktop";
+}
+
+// Layout responsive: desktop vs mobile
+function getLayout() {
+  const w = window.innerWidth;
+
+  // 📱 Mobile: 4 colonnes x 7 lignes
+  if (w <= 700) {
+    return { rows: 7, cols: 4, centerRow: 3, centerCol: 1 };
+    // Si tu préfères plus à droite: centerCol: 2
+  }
+
+  // 🖥️ Desktop: 7 colonnes x 4 lignes
+  return { rows: 4, cols: 7, centerRow: 1, centerCol: 3 };
+}
+
+// ============================
+//       GÉNÉRATION CARTE
+// ============================
+
+function genererNouvelleCarte() {
+  console.log("Génération de la carte Marathon responsive...");
+
+  // Empêche de relancer la fin marathon si on régénère
+  document.body.classList.remove("fin-marathon");
+
+  // Passe en mode "carte"
   document.body.classList.remove("accueil");
   document.body.classList.add("carte");
 
-  const logoEl = document.getElementById("Logo_Marathon");
-  if (logoEl) logoEl.classList.add("logo-small");
+  // Réduit le logo
+  const logoMarathon = document.getElementById("Logo_Marathon");
+  if (logoMarathon) logoMarathon.classList.add("logo-small");
 
   const table = document.getElementById("carte");
   const imagesFolder = "images/";
@@ -63,8 +104,18 @@ function genererNouvelleCarte() {
     return;
   }
 
+  // Layout selon écran
+  const { rows: GRID_ROWS, cols: GRID_COLS, centerRow: CENTER_ROW, centerCol: CENTER_COL } = getLayout();
+
+  // ✅ on mémorise le mode actuel (utile pour resize perf)
+  lastLayoutMode = getLayoutMode();
+
+  // Info CSS pour ajuster la taille des cases
+  document.documentElement.style.setProperty("--grid-cols", GRID_COLS);
+
   table.innerHTML = "";
 
+  // 27 images à placer (hors centre)
   const imagesMelangees = shuffle([...ListeImages]);
   let indexImage = 0;
 
@@ -76,17 +127,22 @@ function genererNouvelleCarte() {
       const img = document.createElement("img");
 
       if (i === CENTER_ROW && j === CENTER_COL) {
+        // Centre fixe
         img.src = imagesFolder + centerImage.name;
         img.alt = "Image centre Marathon";
+
+        // Centre non cliquable
+        cell.classList.add("cell-center");
+        cell.style.cursor = "default";
       } else {
         const imageData = imagesMelangees[indexImage];
         if (!imageData) {
-          // Si un jour tu changes la taille et qu'il manque des images, on évite le crash
-          cell.classList.add("empty");
-          continue;
+          // Si jamais manque d'images, on laisse vide
+          cell.classList.add("cell-empty");
+        } else {
+          img.src = imagesFolder + imageData.name;
+          img.alt = "Image " + imageData.id;
         }
-        img.src = imagesFolder + imageData.name;
-        img.alt = "Image " + imageData.id;
         indexImage++;
       }
 
@@ -102,37 +158,24 @@ function genererNouvelleCarte() {
       cell.appendChild(img);
       cell.appendChild(overlay);
 
-      // ✅ Centre = pas cliquable
-      if (i === CENTER_ROW && j === CENTER_COL) {
-        cell.classList.add("cell-center");
-        cell.style.cursor = "default";
-        // Pas d'event listener
-      } else {
+      // Clic uniquement si pas centre
+      if (!(i === CENTER_ROW && j === CENTER_COL)) {
         cell.addEventListener("click", function () {
           toggleSelected(this);
         });
       }
-     }
-     }
-     } 
-      
-
-
-  // 🔽 ICI : on passe le logo en version "petit"
-  const logoMarathon = document.getElementById("Logo_Marathon");
-  if (logoMarathon) {
-    logoMarathon.classList.add("logo-small");
+    }
   }
-
-
+}
 
 // ============================
 //       SÉLECTION / SON
 // ============================
 
 function toggleSelected(cell) {
-  // Sécurité: si un jour un clic arrive sur la case centre, on ignore
+  // Sécurité
   if (cell.classList.contains("cell-center")) return;
+  if (document.body.classList.contains("fin-marathon")) return;
 
   if (cell.classList.contains("selected")) {
     cell.classList.remove("selected");
@@ -148,12 +191,63 @@ function toggleSelected(cell) {
   verifierFinMarathon();
 }
 
-
 function jouerSonBingo() {
   const audio = document.getElementById("bingoSound");
   if (!audio) return;
   audio.volume = 0.2;
-  audio.play();
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
+}
+
+// ============================
+//       FIN MARATHON
+// ============================
+
+function verifierFinMarathon() {
+  const table = document.getElementById("carte");
+  if (!table) return;
+
+  const selectedCount = table.querySelectorAll("td.selected").length;
+
+  if (selectedCount === TOTAL_SELECTABLE) {
+    afficherMessageBravoEtRetour();
+  }
+}
+
+function afficherMessageBravoEtRetour() {
+  if (document.body.classList.contains("fin-marathon")) return;
+  document.body.classList.add("fin-marathon");
+
+  let msg = document.getElementById("marathon-message");
+  if (!msg) {
+    msg = document.createElement("div");
+    msg.id = "marathon-message";
+    document.body.appendChild(msg);
+  }
+
+  msg.textContent = "Marathon terminé 🎉";
+  msg.style.display = "block";
+
+  setTimeout(() => {
+    // Supprime la grille
+    const table = document.getElementById("carte");
+    if (table) table.innerHTML = "";
+
+    // Retour accueil
+    document.body.classList.remove("carte");
+    document.body.classList.add("accueil");
+    document.body.classList.remove("fin-marathon");
+
+    // Logo redevient grand
+    const logo = document.getElementById("Logo_Marathon");
+    if (logo) logo.classList.remove("logo-small");
+
+    // Cache message
+    msg.style.display = "none";
+
+    // Remonte en haut
+    window.scrollTo(0, 0);
+  }, 10000);
 }
 
 // ============================
@@ -164,7 +258,6 @@ function shuffle(array) {
   let currentIndex = array.length;
   let randomIndex;
 
-  // Algorithme de Fisher–Yates
   while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
@@ -178,70 +271,30 @@ function shuffle(array) {
   return array;
 }
 
-function verifierFinMarathon() {
-  const table = document.getElementById("carte");
-  if (!table) return;
-
-  // ✅ on compte uniquement les cases selected (la case centre n'est jamais selected)
-  const selectedCount = table.querySelectorAll("td.selected").length;
-
-  if (selectedCount === TOTAL_SELECTABLE) {
-    afficherMessageBravoEtRetour();
-  }
-}
-
-// ============================
-//   VERIF FIN DE MARATHON
-// ============================
-
-function afficherMessageBravoEtRetour() {
-  // éviter de déclencher 2 fois
-  if (document.body.classList.contains("fin-marathon")) return;
-  document.body.classList.add("fin-marathon");
-
-  // Crée/affiche un message
-  let msg = document.getElementById("marathon-message");
-  if (!msg) {
-    msg = document.createElement("div");
-    msg.id = "marathon-message";
-    document.body.appendChild(msg);
-  }
-
-  msg.textContent = " Marathon terminé 🎉";
-  msg.style.display = "block";
-
-  // Après 10 secondes: reset + retour accueil
-  setTimeout(() => {
-    // Supprime la grille
-    const table = document.getElementById("carte");
-    if (table) table.innerHTML = "";
-
-    // Revenir en accueil
-    document.body.classList.remove("carte");
-    document.body.classList.add("accueil");
-    document.body.classList.remove("fin-marathon");
-
-    // Remettre logo grand
-    const logo = document.getElementById("Logo_Marathon");
-    if (logo) logo.classList.remove("logo-small");
-
-    // Cache le message
-    msg.style.display = "none";
-
-    // (Optionnel) remonter en haut
-    window.scrollTo(0, 0);
-  }, 10000);
-}
-
 // ============================
 //   INITIALISATION
 // ============================
 
 document.addEventListener("DOMContentLoaded", () => {
-  // On peut soit générer direct, soit attendre le clic.
-  // Là on attend le clic, comme pour les autres pages :
+  // Affiche le bouton générer
   const boutonGenerer = document.getElementById("boutonGenerer");
-  if (boutonGenerer) {
-    boutonGenerer.style.display = "block";
-  }
+  if (boutonGenerer) boutonGenerer.style.display = "block";
+
+  // Initialise le mode actuel
+  lastLayoutMode = getLayoutMode();
+});
+
+// ✅ Resize PERF: debounce + regen seulement si changement mobile/desktop
+window.addEventListener("resize", () => {
+  if (!document.body.classList.contains("carte")) return;
+  if (document.body.classList.contains("fin-marathon")) return;
+
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const mode = getLayoutMode();
+    if (mode !== lastLayoutMode) {
+      lastLayoutMode = mode;
+      genererNouvelleCarte();
+    }
+  }, 200);
 });

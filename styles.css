@@ -4,6 +4,10 @@
 
 * { box-sizing: border-box; }
 
+:root{
+  --grid-cols: 7; /* mis à jour par JS */
+}
+
 body {
     margin: 0;
     background: black;
@@ -32,25 +36,21 @@ video {
    ========================= */
 
 body.accueil {
-    background: black;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* centre verticalement */
+    justify-content: center;
     min-height: 100vh;
-    margin: 0;
     padding: 0 12px;
     gap: 14px;
 }
 
 body.carte {
-    background: black;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     min-height: 100vh;
-    margin: 0;
     padding: 10px 12px 18px;
     gap: 10px;
 }
@@ -64,23 +64,15 @@ body.carte {
     gap: 10px;
 }
 
-/* Wrapper grille */
 .grid-wrap{
     width: min(96vw, 1100px);
     display: flex;
     justify-content: center;
 }
 
-/* ✅ En accueil: on cache complètement la zone grille (plus de contour visible) */
-body.accueil .grid-wrap{
-    display: none;
-}
-
-/* ✅ En carte: on l'affiche */
-body.carte .grid-wrap{
-    display: flex;
-}
-
+/* ✅ En accueil: pas de grille visible */
+body.accueil .grid-wrap { display: none; }
+body.carte .grid-wrap { display: flex; }
 
 /* =========================
    LOGO "Marathon"
@@ -104,7 +96,6 @@ body.carte #Logo_Marathon {
     transition: transform 0.3s ease;
 }
 
-/* Hover */
 #Logo_Marathon:hover {
     transform: scale(1.08);
 }
@@ -114,7 +105,6 @@ body.carte #Logo_Marathon.logo-small {
     width: clamp(180px, 22vw, 260px);
     margin-top: 10px;
 }
-
 
 /* =========================
    BOUTONS (style original)
@@ -130,7 +120,7 @@ body.carte #Logo_Marathon.logo-small {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin: 1px 0;
+    margin: 2px 0;
     transition: background-color 0.3s, color 0.3s, transform 0.2s;
     display: block;
     width: fit-content;
@@ -159,7 +149,6 @@ body.carte #Logo_Marathon.logo-small {
     }
 }
 
-
 /* =========================
    TABLE / GRILLE
    ========================= */
@@ -169,38 +158,37 @@ body.carte #Logo_Marathon.logo-small {
     border-collapse: collapse;
 }
 
-/* En accueil: table invisible (évite tout contour) */
-body.accueil #carte {
-    display: none;
-}
+body.accueil #carte { display: none; }
 
-/* En carte: visible + responsive */
 body.carte #carte {
     display: table;
     width: 100%;
     table-layout: fixed;
-
-    /* fond noir ne dépasse pas les bordures: pas de padding ici */
     background: #000;
 }
 
-/* Cellules */
+/* =========================
+   CELLULES (responsive)
+   ========================= */
+
 body.carte td {
     border: clamp(3px, 0.8vw, 7px) solid #585858;
+    background: #000;
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
     position: relative;
     overflow: hidden;
-
-    /* noir uniquement dans la case */
-    background: #000;
-
-    /* cases carrées */
     aspect-ratio: 1 / 1;
 }
 
-/* Image dans la case */
+/* On adapte la "densité" sur mobile (cases plus grandes, bordures un peu plus fines) */
+@media (max-width: 700px) {
+  body.carte td {
+    border-width: clamp(2px, 0.9vw, 5px);
+  }
+}
+
 body.carte td img {
     width: 100%;
     height: 100%;
@@ -215,6 +203,20 @@ body.carte td img {
     transition: transform 1.5s ease;
 }
 
+/* =========================
+   CASE CENTRALE (non interactive)
+   ========================= */
+
+.cell-center {
+  pointer-events: none;
+  cursor: default !important;
+  filter: brightness(1.05);
+}
+
+/* Optionnel: si une case devait être vide */
+.cell-empty {
+  cursor: default;
+}
 
 /* =========================
    OVERLAY / VALIDATION
@@ -227,7 +229,7 @@ body.carte td img {
     z-index: 2;
     display: none;
 
-    /* centrage robuste */
+    /* centrage robuste du logo */
     align-items: center;
     justify-content: center;
 }
@@ -240,14 +242,13 @@ body.carte td img {
     position: relative;
 }
 
-/* Bingo_confirme (si utilisé) */
+/* Bingo_confirme (si tu l'utilises) */
 .selected::before {
     content: url('images/Bingo_confirme.png');
     width: 100%;
     height: 100%;
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease-in-out;
@@ -271,19 +272,31 @@ body.carte td img {
 }
 
 @media only screen and (max-width: 600px) {
-    .selected .logo {
-        width: 50px;
-        height: 50px;
-    }
+    .selected .logo { width: 50px; height: 50px; }
 }
-
 @media only screen and (max-width: 500px) {
-    .selected .logo {
-        width: 40px;
-        height: 40px;
-    }
+    .selected .logo { width: 40px; height: 40px; }
 }
 
+/* =========================
+   MESSAGE FIN
+   ========================= */
+
+#marathon-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.85);
+  color: white;
+  padding: 20px 26px;
+  border: 4px solid #585858;
+  border-radius: 10px;
+  font-size: clamp(22px, 4vw, 46px);
+  text-align: center;
+  z-index: 9999;
+  display: none;
+}
 
 /* =========================
    RÉSEAUX SOCIAUX
@@ -311,14 +324,11 @@ body.carte td img {
 }
 
 @media only screen and (max-width: 600px) {
-    .social-icon {
-        font-size: 20px;
-    }
+    .social-icon { font-size: 20px; }
 }
 
-
 /* =========================
-   MESSAGE BINGO
+   MESSAGE BINGO (si utilisé)
    ========================= */
 
 #bingo-message {
@@ -336,11 +346,8 @@ body.carte td img {
 }
 
 @media only screen and (max-width: 600px) {
-    #bingo-message {
-        font-size: 80px;
-    }
+    #bingo-message { font-size: 80px; }
 }
-
 
 /* =========================
    ANIMATIONS
@@ -353,27 +360,4 @@ body.carte td img {
 
 .fade {
     animation: fade 0.7s ease-in-out infinite alternate;
-}
-
-/* Case centrale: non interactive + style léger */
-.cell-center {
-  pointer-events: none;       /* blindé */
-  filter: brightness(1.05);
-}
-
-/* Message de fin */
-#marathon-message {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.85);
-  color: white;
-  padding: 30px 36px;
-  border: 4px solid #585858;
-  border-radius: 10px;
-  font-size: clamp(22px, 4vw, 46px);
-  text-align: center;
-  z-index: 9999;
-  display: none;
 }
