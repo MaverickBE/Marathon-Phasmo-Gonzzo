@@ -1,287 +1,292 @@
 /* =========================
    BASE
    ========================= */
-
 * { box-sizing: border-box; }
 
-:root{
-  --grid-cols: 7; /* mis à jour par JS */
-}
-
 body {
-    margin: 0;
-    background: black;
-    overflow-x: hidden;
-    font-family: 'Courier New', Courier, monospace;
+  margin: 0;
+  background: black;
+  overflow-x: hidden;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 /* =========================
    VIDÉO BACKGROUND
    ========================= */
-
 video {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    transform: translate(-50%, -50%);
-    z-index: -1;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  z-index: -1;
 }
 
 /* =========================
-   MODES (accueil / carte)
+   MODES
    ========================= */
-
 body.accueil {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 0 12px;
-    gap: 14px;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0 12px;
+  gap: 14px;
 }
 
 body.carte {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    padding: 10px 12px 18px;
-    gap: 10px;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  margin: 0;
+  padding: 10px 12px 18px;
+  gap: 10px;
 }
-
-/* Wrappers */
-.top-ui{
-    width: min(96vw, 1100px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.grid-wrap{
-    width: min(96vw, 1100px);
-    display: flex;
-    justify-content: center;
-}
-
-/* ✅ En accueil: pas de grille visible */
-body.accueil .grid-wrap { display: none; }
-body.carte .grid-wrap { display: flex; }
 
 /* =========================
    LOGO "Marathon"
    ========================= */
-
-/* Accueil: grand, fluide */
-body.accueil #Logo_Marathon {
-    display: block;
-    margin: 0 auto;
-    width: min(900px, 92vw);
-    height: auto;
-    transition: transform 0.3s ease;
-}
-
-/* Carte: grand tant que pas encore logo-small */
+body.accueil #Logo_Marathon,
 body.carte #Logo_Marathon {
-    display: block;
-    margin: 0 auto;
-    width: min(900px, 92vw);
-    height: auto;
-    transition: transform 0.3s ease;
+  display: block;
+  margin: 0 auto;
+  width: min(900px, 92vw);
+  height: auto;
+  max-width: 100%;
+  transition: transform 0.3s ease;
 }
 
 #Logo_Marathon:hover {
-    transform: scale(1.08);
+  transform: scale(1.10);
 }
 
-/* ✅ Carte: quand on génère, il devient petit */
+/* Petit logo après génération */
 body.carte #Logo_Marathon.logo-small {
-    width: clamp(180px, 22vw, 260px);
-    margin-top: 10px;
+  width: clamp(180px, 22vw, 260px);
+  margin-top: 10px;
 }
 
 /* =========================
-   BOUTONS (style original)
+   BOUTONS 
    ========================= */
-
 .bouton-action {
-    padding: 18px 24px;
-    text-align: center;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 18px;
-    background-color: #000000;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 2px 0;
-    transition: background-color 0.3s, color 0.3s, transform 0.2s;
-    display: block;
-    width: fit-content;
-    max-width: 420px;
+  padding: 18px 24px;
+  text-align: center;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 18px;
+  background-color: #000000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 8px 0;
+  transition: background-color 0.3s, color 0.3s, transform 0.2s;
+  display: block;
+  width: fit-content;
+  max-width: 420px;
 }
 
 .bouton-action:hover {
-    background-color: white;
-    color: #000000;
-    transform: scale(1.03);
-}
-
-@media (max-width: 768px) {
-    .bouton-action {
-        font-size: 16px;
-        padding: 12px 18px;
-        max-width: 280px;
-    }
-}
-
-@media (max-width: 480px) {
-    .bouton-action {
-        font-size: 14px;
-        padding: 10px 14px;
-        max-width: 220px;
-    }
+  background-color: white;
+  color: #000000;
+  transform: scale(1.03);
 }
 
 /* =========================
-   TABLE / GRILLE
+   CENTRAGE DES BOUTONS À L'ACCUEIL
    ========================= */
 
+body.accueil .bouton-action {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .bouton-action {
+    font-size: 16px;
+    padding: 12px 18px;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bouton-action {
+    font-size: 14px;
+    padding: 10px 14px;
+    max-width: 220px;
+  }
+}
+
+/* =========================
+   GRILLE / TABLE
+   ========================= */
 #carte {
-    border-spacing: 0;
-    border-collapse: collapse;
+  background-color: rgb(0, 0, 0);
+  border-spacing: 0;
+  border-collapse: collapse;
 }
 
 body.accueil #carte { display: none; }
 
-body.carte #carte {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-    background: #000;
-}
-
 /* =========================
-   CELLULES (responsive)
+   CELLULES
    ========================= */
+td {
+  position: relative;
+  border: 7px solid #585858;
+  width: auto;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  overflow: hidden;
+  background: #000;
 
-body.carte td {
-    border: clamp(3px, 0.8vw, 7px) solid #585858;
-    background: #000;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    aspect-ratio: 1 / 1;
+  /* Taille responsive: on garde carré desktop */
+  aspect-ratio: 1 / 1;
+  padding: 6px;
 }
 
-/* On adapte la "densité" sur mobile (cases plus grandes, bordures un peu plus fines) */
+/* Mobile: cases moins étirées + plus lisibles */
 @media (max-width: 700px) {
-  body.carte td {
-    border-width: clamp(2px, 0.9vw, 5px);
+  td {
+    border-width: 4px;
+    padding: 4px;
+    aspect-ratio: 4 / 5;
   }
 }
 
-body.carte td img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    transition: transform 1.5s ease;
+/* =========================
+   IMAGE DE CASE (SEULEMENT cell-img)
+   ========================= */
+.cell-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+
+  /* ✅ rotation */
+  transition: transform 1.5s ease;
+
+  /* perf Safari */
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
-/* Rotation quand sélectionnée */
-.selected img {
-    transform: rotateY(360deg);
-    transition: transform 1.5s ease;
+/* Optionnel: mobile rempli plus (recadre un peu) */
+@media (max-width: 700px) {
+  .cell-img { object-fit: cover; }
+}
+
+/* ✅ Rotation quand sélectionnée (UNIQUEMENT l’image de la case) */
+td.selected .cell-img {
+  transform: rotateY(360deg);
 }
 
 /* =========================
-   CASE CENTRALE (non interactive)
+   CASE CENTRALE
    ========================= */
-
 .cell-center {
   pointer-events: none;
   cursor: default !important;
   filter: brightness(1.05);
 }
 
-/* Optionnel: si une case devait être vide */
 .cell-empty {
   cursor: default;
 }
 
 /* =========================
-   OVERLAY / VALIDATION
+   OVERLAY / VALIDATION (LOGO TOUJOURS VISIBLE ✅)
    ========================= */
-
 .overlay {
-    position: absolute;
-    inset: 0;
-    background-color: rgba(47, 80, 31, 0.7);
-    z-index: 2;
-    display: none;
+  position: absolute;
+  inset: 0;
+  background-color: rgba(47, 80, 31, 0.7);
+  z-index: 10;
+  display: none;
 
-    /* centrage robuste du logo */
-    align-items: center;
-    justify-content: center;
+  /* centrage du logo */
+  align-items: center;
+  justify-content: center;
 }
 
-.selected .overlay {
-    display: flex;
+/* affiche overlay quand selected */
+td.selected .overlay {
+  display: flex;
 }
 
-.selected {
-    position: relative;
-}
-
-/* Bingo_confirme (si tu l'utilises) */
-.selected::before {
-    content: url('images/Bingo_confirme.png');
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.selected.show-logo::before {
-    opacity: 1;
-}
-
-/* Logo validé */
+/* Logo de validation (PAS affecté par .cell-img) */
 .logo {
-    width: 60px;
-    height: 60px;
-    transition: transform 1.5s ease;
+  width: 60px;
+  height: 60px;
+  display: block;
+  z-index: 11;
+  transition: transform 1.5s ease;
 }
 
-.selected .logo {
-    transform: rotateY(180deg);
-    width: 70px;
-    height: 70px;
+/* petit flip optionnel sur le logo */
+td.selected .logo {
+  transform: rotateY(180deg);
+  width: 70px;
+  height: 70px;
 }
 
-@media only screen and (max-width: 600px) {
-    .selected .logo { width: 50px; height: 50px; }
+@media (max-width: 600px) {
+  td.selected .logo { width: 50px; height: 50px; }
 }
-@media only screen and (max-width: 500px) {
-    .selected .logo { width: 40px; height: 40px; }
+@media (max-width: 500px) {
+  td.selected .logo { width: 40px; height: 40px; }
+}
+
+/* (Optionnel) ton Bingo_confirme si tu veux le garder, mais en dessous du logo */
+td.selected::before {
+  content: url('images/Bingo_confirme.png');
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 5; /* en dessous overlay/logo */
+}
+
+td.selected.show-logo::before {
+  opacity: 1;
+}
+
+/* =========================
+   RÉSEAUX SOCIAUX
+   ========================= */
+#reseaux-sociaux {
+  margin-top: 10px;
+  display: flex;
+  gap: 20px;
+}
+
+.social-icon {
+  font-size: 40px;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.social-icon:hover { color: #000000; }
+
+@media (max-width: 600px) {
+  .social-icon { font-size: 20px; }
 }
 
 /* =========================
    MESSAGE FIN
    ========================= */
-
 #marathon-message {
   position: fixed;
   top: 50%;
@@ -296,68 +301,4 @@ body.carte td img {
   text-align: center;
   z-index: 9999;
   display: none;
-}
-
-/* =========================
-   RÉSEAUX SOCIAUX
-   ========================= */
-
-#reseaux-sociaux {
-    margin-top: 10px;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    justify-content: center;
-}
-
-.social-icon {
-    font-size: 40px;
-    color: #ffffff;
-    text-decoration: none;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-}
-
-.social-icon:hover {
-    color: #000000;
-}
-
-@media only screen and (max-width: 600px) {
-    .social-icon { font-size: 20px; }
-}
-
-/* =========================
-   MESSAGE BINGO (si utilisé)
-   ========================= */
-
-#bingo-message {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 170px;
-    font-family: 'October Crow', 'Courier New', Courier, monospace;
-    color: #ffffff;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 20px;
-    display: none;
-    z-index: 3;
-}
-
-@media only screen and (max-width: 600px) {
-    #bingo-message { font-size: 80px; }
-}
-
-/* =========================
-   ANIMATIONS
-   ========================= */
-
-@keyframes fade {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.fade {
-    animation: fade 0.7s ease-in-out infinite alternate;
 }
